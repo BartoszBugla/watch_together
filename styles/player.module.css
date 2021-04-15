@@ -1,0 +1,12 @@
+.playerWrapper {
+  width: auto;
+  height: auto;
+}
+.reactPlayer {
+  padding-top: 56.25%;
+  position: relative;
+}
+
+.react-Player > div {
+  position: absolute;
+}

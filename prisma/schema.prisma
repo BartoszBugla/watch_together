@@ -1,0 +1,25 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Room{
+  id        Int      @unique  @id @default(autoincrement())
+  current_video     String
+  current_second    Float
+  isPlaying         Boolean
+  host Int @default(1)
+  users     Int[]
+}
+// model User{ 
+//   id      Int      @id @default(autoincrement())
+//   room    Room?    @relation(fields: [RoomId], references: [id])
+//   RoomId  Int?
+// }
