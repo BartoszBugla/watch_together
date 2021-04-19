@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 const handler = async (req, res) => {
   const uuid = uuidv4();
 
-  ApiHandler(req, res, "POST", async () => {
+  await ApiHandler(req, res, "POST", async () => {
     const newRoom = await prisma.room.create({
       data: {
         current_video: "",

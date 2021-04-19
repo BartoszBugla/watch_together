@@ -14,9 +14,25 @@ import SearchResults from "components/SearchResults";
 interface componentProps {
   data: RoomType;
   userId: number;
+  query: string;
 }
 
-const Home: React.FC<componentProps> = ({ data, userId }) => {
+const Home: React.FC<componentProps> = ({ data, userId, query }) => {
+  // const [data, setRes] = useState({
+  //   users: "",
+  //   id: "",
+  //   current_video: "",
+  //   current_second: 0,
+  //   isPlaying: false,
+  //   host: 0,
+  //   //@ts-ignore
+  //   users: [],
+  // });
+  // useEffect(() => {
+  //   axios(`/api/rooms/${query}`).then((r) => {
+  //     setRes(r.data.room);
+  //   });
+  // }, []);
   const [currentUsers, setCurrentUsers] = useState(data.users);
 
   const router = useRouter();
@@ -82,15 +98,15 @@ const Home: React.FC<componentProps> = ({ data, userId }) => {
 };
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const res = await prisma.room.findFirst({
-    //@ts-ignore
-    where: { id: ctx.query.roomId },
+    where: { id: String(ctx.query.roomId) },
   });
-  console.log(res);
+  console.log("respond:", res);
   const userId = getUserIdFromCookies(ctx);
   return {
     props: {
       data: res,
       userId,
+      query: ctx.query.roomId,
     },
   };
 };
