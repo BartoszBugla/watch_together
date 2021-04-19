@@ -82,7 +82,8 @@ const Home: React.FC<componentProps> = ({ data, userId }) => {
 };
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const res = await prisma.room.findFirst({
-    where: { id: String(ctx.query.roomId) },
+    //@ts-ignore
+    where: { id: ctx.query.roomId },
   });
   console.log(res);
   const userId = getUserIdFromCookies(ctx);
