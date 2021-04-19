@@ -1,5 +1,5 @@
 export type RoomType = {
-  id: number;
+  id: string;
   current_video: string;
   current_second: number;
   isPlaying: boolean;
