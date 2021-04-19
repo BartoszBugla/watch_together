@@ -1,14 +1,11 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import pusher from "helpers/pusher";
-const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  if (req.method == "POST") {
-    const { roomId, to, from } = req.body;
-    try {
-      pusher.trigger(`room-${roomId}`, "request-sync", { to, from });
-      res.json({ msg: "Requsted for sync" });
-    } catch (error) {
-      console.log(error);
-    }
-  }
+import ApiHandler from "helpers/apiHandler";
+const handler = (req: NextApiRequest, res: NextApiResponse) => {
+  const { roomId, to, from } = req.body;
+  ApiHandler(req, res, "POST", async () => {
+    pusher.trigger(`room-${roomId}`, "request-sync", { to, from });
+    res.json({ msg: "Requsted for sync" });
+  });
 };
 export default handler;

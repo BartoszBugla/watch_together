@@ -1,10 +1,14 @@
 import "tailwindcss/tailwind.css";
 import { QueryClient, QueryClientProvider } from "react-query";
+import { SearchContextProvider } from "hooks/SearchResultsContext";
 const queryClient = new QueryClient();
 function MyApp({ Component, pageProps }) {
   return (
     <QueryClientProvider client={queryClient}>
-      <Component {...pageProps} />
+      <SearchContextProvider>
+        {" "}
+        <Component {...pageProps} />
+      </SearchContextProvider>
     </QueryClientProvider>
   );
 }

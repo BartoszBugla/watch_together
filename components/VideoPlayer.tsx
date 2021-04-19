@@ -4,20 +4,25 @@ import React, { useEffect, useRef, useState } from "react";
 import Pusher from "pusher-js";
 import ReactPlayer from "react-player/youtube";
 import ProgressBar from "./player/ProgressBar";
-import ChangeUrlInput from "./player/ChangeUrlInput";
 
-const VideoPlayer = ({ data, userId }) => {
-  const { id } = data;
+import type { RoomType } from "types";
+import Bottom from "./player/Bottom ";
+interface componentProps {
+  room: RoomType;
+  userId: number;
+}
+const VideoPlayer: React.FC<componentProps> = ({ room, userId }) => {
+  const id = String(room.id);
   // current Second
   // currentVideo
   const player = useRef(null);
-  const [currentVideo, setCurrentVideo] = useState(data.current_video);
-  const [isPlaying, setIsPlaying] = useState(data.isPlaying);
+  const [currentVideo, setCurrentVideo] = useState(room.current_video);
+  const [isPlaying, setIsPlaying] = useState(room.isPlaying);
   const [isMuted, setIsMuted] = useState(true);
-  const [url, setUrl] = useState();
-  const [currentSecond, setCurrentSecond] = useState(data.current_second);
+  const [currentSecond, setCurrentSecond] = useState(room.current_second);
   const [duration, setDuration] = useState();
   const [isHovering, setIsHovering] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   useEffect(() => {
     let pusher = new Pusher("cd9121d850b869bd73fa", {
@@ -26,13 +31,11 @@ const VideoPlayer = ({ data, userId }) => {
     //subscribe room
     let channel = pusher.subscribe(`room-${id}`);
     channel.bind("pusher:subscription_succeeded", () => {
-      axios
-        .post("api/player/requestsync", {
-          roomId: data.id,
-          to: data.users[0],
-          from: userId,
-        })
-        .then(() => console.log("requestiing for sync "));
+      axios.post("/api/player/requestsync", {
+        roomId: room.id,
+        to: room.users[0],
+        from: userId,
+      });
     });
     //actions
     channel.bind("seturl", (data) => {
@@ -53,52 +56,42 @@ const VideoPlayer = ({ data, userId }) => {
     });
     channel.bind("request-sync", ({ from, to }) => {
       if (userId == to)
-        axios
-          .post("api/player/sendsync", {
-            to: from,
-            seconds: player.current.getCurrentTime(),
-            roomId: id,
-          })
-          .then(() =>
-            console.log(
-              "I got requested and i am sending:",
-              player.current.getCurrentTime()
-            )
-          );
+        axios.post("/api/player/sendsync", {
+          to: from,
+          seconds: player.current.getCurrentTime(),
+          roomId: id,
+        });
     });
     channel.bind("receive-sync", ({ seconds, to }) => {
       if (userId == to) {
         setCurrentSecond(seconds);
-        console.log(" I receved currentTime ", seconds);
         player.current.seekTo(seconds);
       }
     });
-    console.log(player);
     return () => {
       pusher.disconnect();
     };
   }, []);
   //action requests
   const play = () => {
-    axios.post("/api/player/play", { id });
+    axios.post("/api/player/play", { roomId: String(id) });
   };
   const stop = () => {
-    axios.post("/api/player/stop", { id });
+    axios.post("/api/player/stop", { roomId: String(id) });
   };
 
   const playerReady = () => {
     setDuration(player.current.getDuration());
   };
   useEffect(() => {
-    console.log("changingVideo", player.current.getDuration());
     setDuration(player.current.getDuration());
   }, [isPlaying]);
 
   const skipTo = (second) => {
     player.current.seekTo(second);
-    console.log(second);
+
     setCurrentSecond(second);
-    axios.post("api/player/skip", { id: data.id, second });
+    axios.post("/api/player/skip", { roomId: id, second });
   };
   // const sync = (second) => {
   //   console.log("ha ha ha ");
@@ -108,27 +101,38 @@ const VideoPlayer = ({ data, userId }) => {
   const onProgressHandler = () => {
     // console.log(player.current.getCurrentTime());
     setCurrentSecond(player.current.getCurrentTime());
-
-    axios.post("/api/player/sync", { id, second: currentSecond });
   };
 
   return (
-    <div style={{ height: "800px" }} className=" flex flex-col justify-center ">
+    <div
+      // style={{ height: "800px" }}
+      style={{
+        height: isFullscreen && "100%",
+        margin: "auto",
+        position: isFullscreen ? "absolute" : "static",
+        // paddingTop: "2%",
+        // opacity: currentVideo.length < 1 && "0",
+        width: isFullscreen && "100%",
+        left: 0,
+        top: 0,
+      }}
+      className={`flex flex-col justify-center `}
+    >
       <div
         style={{
-          height: "610px",
+          height: isFullscreen ? "100%" : "610px",
           margin: "auto",
-          position: "relative",
+          position: isFullscreen ? "absolute" : "relative",
           opacity: currentVideo.length < 1 && "0",
-          width: "1080px",
+          width: isFullscreen ? "100%" : "1080px",
         }}
-        className="w-3/4"
+        // className="w-3/4"
         onMouseOver={() => setIsHovering(true)}
         onMouseOut={() => setIsHovering(false)}
       >
         <ReactPlayer
           width="100%"
-          height="100%"
+          height="95%"
           ref={player}
           onPlay={play}
           onPause={stop}
@@ -141,7 +145,9 @@ const VideoPlayer = ({ data, userId }) => {
           onReady={playerReady}
           url={currentVideo}
           playsinline={false}
+          volume={0.5}
           config={{
+            //@ts-ignore
             youtube: {
               playerVars: {
                 modestbranding: 1,
@@ -158,16 +164,25 @@ const VideoPlayer = ({ data, userId }) => {
             },
           }}
         ></ReactPlayer>
-        <ProgressBar
+        <Bottom
+          play={play}
+          stop={stop}
           progress={currentSecond}
           duration={duration}
           skipTo={skipTo}
           isPlaying={isPlaying}
           isHovering={isHovering}
+          isMuted={isMuted}
+          mute={() => setIsMuted(!isMuted)}
+          fullscreen={() => {
+            setIsFullscreen(!isFullscreen);
+            var elem = document.documentElement;
+            if (!isFullscreen) elem.requestFullscreen();
+            if (isFullscreen) document.exitFullscreen();
+          }}
+          // fullscreen={()=>player.requestFullscreen()}
         />
       </div>
-
-      <ChangeUrlInput id={id} />
     </div>
   );
 };

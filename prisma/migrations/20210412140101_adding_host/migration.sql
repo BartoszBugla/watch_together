@@ -1,2 +1,0 @@
--- AlterTable
-ALTER TABLE "Room" ADD COLUMN     "host" INTEGER NOT NULL DEFAULT 1;

@@ -1,14 +1,22 @@
-import VideoPlayer from "../components/VideoPlayer";
+import VideoPlayer from "components/VideoPlayer";
 import { useRouter } from "next/router";
 import { PrismaClient } from "@prisma/client";
 import { GetServerSideProps } from "next";
-import getUserIdFromCookies from "../helpers/getUserIdFromCookies";
-import Navbar from "../components/navbar";
+import getUserIdFromCookies from "../../helpers/getUserIdFromCookies";
+import Navbar from "components/navbar";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import Pusher from "pusher-js";
 const prisma = new PrismaClient();
-const Home = ({ data, userId }) => {
+import React from "react";
+import type { RoomType } from "types";
+import SearchResults from "components/SearchResults";
+interface componentProps {
+  data: RoomType;
+  userId: number;
+}
+
+const Home: React.FC<componentProps> = ({ data, userId }) => {
   const [currentUsers, setCurrentUsers] = useState(data.users);
 
   const router = useRouter();
@@ -21,8 +29,8 @@ const Home = ({ data, userId }) => {
 
     channel.bind("pusher:subscription_succeeded", () => {
       axios
-        .post("api/player/connect", {
-          roomId: Number(data.id),
+        .post("/api/player/connect", {
+          roomId: String(data.id),
           userId: Number(userId),
         })
         .then(() =>
@@ -44,16 +52,13 @@ const Home = ({ data, userId }) => {
   }, []);
   useEffect(() => {
     const handleRouteChange = () => {
-      axios.post("api/player/disconnect", {
-        roomId: Number(data.id),
+      axios.post("/api/player/disconnect", {
+        roomId: String(data.id),
         userId: Number(userId),
       });
     };
     window.onbeforeunload = handleRouteChange;
     router.events.on("routeChangeStart", handleRouteChange);
-
-    // If the component is unmounted, unsubscribe
-    // from the event with the `off` method:
     return () => {
       router.events.off("routeChangeStart", handleRouteChange);
     };
@@ -66,19 +71,20 @@ const Home = ({ data, userId }) => {
         style={{
           width: "100%",
           flex: "1",
+          // position: "relative",
         }}
       >
-        <VideoPlayer userId={userId} data={data} />
+        <SearchResults roomId={data.id} userId={userId} />
+        <VideoPlayer userId={userId} room={data} />
       </div>
     </div>
   );
 };
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  //   console.log(ctx.query.roomId);
   const res = await prisma.room.findFirst({
-    where: { id: Number(ctx.query.roomId) },
+    where: { id: String(ctx.query.roomId) },
   });
-
+  console.log(res);
   const userId = getUserIdFromCookies(ctx);
   return {
     props: {

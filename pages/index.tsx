@@ -15,11 +15,11 @@ function Home({ userId }) {
   const generateRoom = async () => {
     const res = await axios({
       method: "POST",
-      url: "/api/room",
+      url: "/api/rooms",
       data: { host: Number(userId) },
     });
     console.log(res);
-    router.push(`/${res.data.room.id}`);
+    router.push(`/rooms/${res.data.room.id}`);
   };
   return (
     <div className="flex flex-col min-h-screen relative">

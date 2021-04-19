@@ -10,4 +10,7 @@ module.exports = {
 
     return config;
   },
+  images: {
+    domains: ["img.youtube.com", "i.ytimg.com", "yt3.ggpht.com"],
+  },
 };
