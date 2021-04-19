@@ -12,7 +12,7 @@ generator client {
 }
 
 model Room{
-  id   String   @db.Uuid @id @default(cuid())
+  id   String   @id @default(cuid())
   current_video     String
   current_second    Float
   isPlaying         Boolean
