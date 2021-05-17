@@ -1,5 +1,6 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import ProgressBar from "./ProgressBar";
+import alwaysTwoDigits from "helpers/AlwaysTwoDigits";
 //@ts-ignore
 import PlaySvg from "public/play.svg";
 //@ts-ignore
@@ -10,6 +11,7 @@ import StopSvg from "public/stop.svg";
 import MuteSvg from "public/mute.svg";
 //@ts-ignore
 import VolumeSvg from "public/volume.svg";
+import VolumeBar from "./VolumeBar";
 interface componentProps {
   progress: number;
   duration: number;
@@ -21,28 +23,28 @@ interface componentProps {
   isMuted: boolean;
   mute: () => void;
   fullscreen: () => void;
+  volume: number;
+  setVolume: React.Dispatch<React.SetStateAction<number>>;
 }
-import alwaysTwoDigits from "helpers/AlwaysTwoDigits";
+
 const options = { svgSize: 18 };
 const Bottom: React.FC<componentProps> = (props) => {
-  useEffect(() => {}, [props.duration]);
+  const [isOpenVolumeBar, setIsOpenVolumeBar] = useState(false);
+
   return (
     <div
       style={{
-        // position: "absolute",
-        // bottom: "0",
-        // left: "2.5%",
         width: "100%",
-        // height: "50px",
         padding: "2px",
         backgroundColor: "rgba(0,0,0,0.3) ",
+        zIndex: 30,
       }}
     >
       <div
         style={{ fill: "white" }}
-        className="flex flex-row justify-between items-center  p-2"
+        className="flex flex-col-reverse md:flex-row justify-between items-center  p-2"
       >
-        <div className="flex flex-row w-48  items-center justify-around ">
+        <div className="flex flex-row w-56  items-center justify-around ">
           {props.isPlaying ? (
             <span>
               <StopSvg
@@ -60,23 +62,36 @@ const Bottom: React.FC<componentProps> = (props) => {
               />
             </span>
           )}
-          {props.isMuted ? (
-            <span>
-              <MuteSvg
-                onClick={props.mute}
-                width={options.svgSize}
-                height={options.svgSize}
-              />
-            </span>
-          ) : (
-            <span>
-              <VolumeSvg
-                onClick={props.mute}
-                width={options.svgSize}
-                height={options.svgSize}
-              />
-            </span>
-          )}
+          <div
+            onMouseOver={() => setIsOpenVolumeBar(true)}
+            onMouseLeave={() => setIsOpenVolumeBar(false)}
+            className="relative w-16 flex justify-between items-center "
+          >
+            {/* /////////////////////////////////////////////// */}
+            {props.isMuted ? (
+              <span>
+                <MuteSvg
+                  onClick={props.mute}
+                  width={options.svgSize}
+                  height={options.svgSize}
+                />
+              </span>
+            ) : (
+              <span>
+                <VolumeSvg
+                  onClick={props.mute}
+                  width={options.svgSize}
+                  height={options.svgSize}
+                />
+              </span>
+            )}
+            {/* /////////////////////////////////////////////// */}
+            <VolumeBar
+              isOpen={isOpenVolumeBar}
+              volume={props.volume}
+              setVolume={props.setVolume}
+            />
+          </div>
 
           <p>
             {Math.floor(props.progress / 60)}:
@@ -86,10 +101,9 @@ const Bottom: React.FC<componentProps> = (props) => {
           </p>
         </div>
 
-        <ProgressBar {...props} />
-
-        <div>
-          <p>
+        <div className="w-full flex flex-row items-center justify-around md:justify-between">
+          <ProgressBar {...props} />
+          <p className="px-2">
             <FullscreenSvg
               onClick={props.fullscreen}
               width={options.svgSize}
@@ -97,6 +111,7 @@ const Bottom: React.FC<componentProps> = (props) => {
             />
           </p>
         </div>
+        <div></div>
       </div>
     </div>
   );

@@ -1,9 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { PrismaClient } from "@prisma/client";
-
-import ApiHandler from "helpers/apiHandler";
 const prisma = new PrismaClient();
-const handler = async (req, res) => {
+import ApiHandler from "helpers/apiHandler";
+
+const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   await ApiHandler(req, res, "POST", async () => {
     const newRoom = await prisma.room.create({
       data: {

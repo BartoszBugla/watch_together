@@ -2,10 +2,10 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 import pusher from "helpers/pusher";
 import ApiHandler from "helpers/apiHandler";
-const handler = (req, res) => {
+const handler = async (req, res) => {
   const { roomId, url } = req.body;
 
-  ApiHandler(req, res, "POST", async () => {
+  await ApiHandler(req, res, "POST", async () => {
     pusher.trigger(`room-${roomId}`, "seturl", url);
 
     await prisma.room.update({

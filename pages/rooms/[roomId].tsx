@@ -1,16 +1,20 @@
-import VideoPlayer from "components/VideoPlayer";
+import VideoPlayer from "components/player";
 import { useRouter } from "next/router";
 import { PrismaClient } from "@prisma/client";
 import { GetServerSideProps } from "next";
 import getUserIdFromCookies from "../../helpers/getUserIdFromCookies";
 import Navbar from "components/navbar";
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import Pusher from "pusher-js";
 const prisma = new PrismaClient();
 import React from "react";
 import type { RoomType } from "types";
-import SearchResults from "components/SearchResults";
+import SearchResults from "components/Search/SearchResults";
+import Chat from "components/Chat/index";
+import { FullscreenContext } from "hooks/useFullscreen";
+import { PusherContext } from "hooks/PusherContext";
+
 interface componentProps {
   data: RoomType;
   userId: number;
@@ -18,28 +22,12 @@ interface componentProps {
 }
 
 const Home: React.FC<componentProps> = ({ data, userId, query }) => {
-  // const [data, setRes] = useState({
-  //   users: "",
-  //   id: "",
-  //   current_video: "",
-  //   current_second: 0,
-  //   isPlaying: false,
-  //   host: 0,
-  //   //@ts-ignore
-  //   users: [],
-  // });
-  // useEffect(() => {
-  //   axios(`/api/rooms/${query}`).then((r) => {
-  //     setRes(r.data.room);
-  //   });
-  // }, []);
   const [currentUsers, setCurrentUsers] = useState(data.users);
-
+  const [isFullscreen] = useContext(FullscreenContext);
   const router = useRouter();
+  const pusher = useContext(PusherContext);
+
   useEffect(() => {
-    let pusher = new Pusher("cd9121d850b869bd73fa", {
-      cluster: "eu",
-    });
     //subscribe room
     let channel = pusher.subscribe(`room-${data.id}`);
 
@@ -79,33 +67,41 @@ const Home: React.FC<componentProps> = ({ data, userId, query }) => {
       router.events.off("routeChangeStart", handleRouteChange);
     };
   }, []);
-  useEffect(() => {}, [currentUsers]);
+
   return (
     <div className="flex flex-col min-h-screen relative bg-gray-800 text-gray-200 ">
-      <Navbar users={currentUsers} host={data.host} roomId={data.id} />
-      <div
-        style={{
-          width: "100%",
-          flex: "1",
-          // position: "relative",
-        }}
-      >
-        <SearchResults roomId={data.id} userId={userId} />
-        <VideoPlayer userId={userId} room={data} />
+      {!isFullscreen && (
+        <Navbar users={currentUsers} host={data.host} roomId={data.id} />
+      )}
+      <SearchResults roomId={data.id} userId={userId} />
+      <div className="flex-1 w-full relative">
+        {!isFullscreen && <Chat roomId={data.id} />}
+
+        <VideoPlayer users={currentUsers} userId={userId} room={data} />
       </div>
     </div>
   );
 };
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  console.log(ctx.query.roomId);
-  const res = await prisma.room.findFirst({
+  // if (ctx.req) {
+  //   const userAgent = ctx.req.headers["user-agent"];
+  //   console.log(userAgent);
+  // }
+  const room = await prisma.room.findFirst({
     where: { id: String(ctx.query.roomId) },
   });
-  console.log("respond:", res);
+  await prisma.$disconnect();
+  if (!room)
+    return {
+      redirect: {
+        permanent: false,
+        destination: "/404",
+      },
+    };
   const userId = getUserIdFromCookies(ctx);
   return {
     props: {
-      data: res,
+      data: room,
       userId,
       query: ctx.query.roomId,
     },

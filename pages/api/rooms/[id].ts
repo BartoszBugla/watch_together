@@ -4,7 +4,6 @@ const prisma = new PrismaClient();
 import apiHandler from "helpers/apiHandler";
 const handler = async (req, res) => {
   await apiHandler(req, res, "GET", async () => {
-    console.log(req.query.id);
     const room = await prisma.room.findFirst({
       where: { id: String(req.query.id) },
     });
