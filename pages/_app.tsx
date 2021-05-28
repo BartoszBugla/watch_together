@@ -5,23 +5,29 @@ import { ChatContextProvider } from "hooks/useChat";
 import { PusherProvider } from "hooks/PusherContext";
 import { FullscreenContextProvider } from "hooks/useFullscreen";
 import Pusher from "pusher-js";
+import Head from "next/head";
 const queryClient = new QueryClient();
 const pusher = new Pusher("cd9121d850b869bd73fa", {
   cluster: "eu",
 });
 function MyApp({ Component, pageProps }) {
   return (
-    <FullscreenContextProvider>
-      <PusherProvider pusher={pusher}>
-        <QueryClientProvider client={queryClient}>
-          <ChatContextProvider>
-            <SearchContextProvider>
-              <Component {...pageProps} />
-            </SearchContextProvider>
-          </ChatContextProvider>
-        </QueryClientProvider>
-      </PusherProvider>
-    </FullscreenContextProvider>
+    <>
+      <Head>
+        <title>Watch Together</title>
+      </Head>
+      <FullscreenContextProvider>
+        <PusherProvider pusher={pusher}>
+          <QueryClientProvider client={queryClient}>
+            <ChatContextProvider>
+              <SearchContextProvider>
+                <Component {...pageProps} />
+              </SearchContextProvider>
+            </ChatContextProvider>
+          </QueryClientProvider>
+        </PusherProvider>
+      </FullscreenContextProvider>
+    </>
   );
 }
 
