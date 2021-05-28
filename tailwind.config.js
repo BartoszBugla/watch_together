@@ -22,6 +22,7 @@ module.exports = {
       backgroundColor: ["active"],
       height: ["hover", "focus"],
       filter: ["hover", "focus"],
+      fill: ["hover", "focus"],
     },
   },
 };

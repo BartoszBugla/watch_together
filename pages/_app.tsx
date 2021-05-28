@@ -1,7 +1,7 @@
 import "tailwindcss/tailwind.css";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { SearchContextProvider } from "hooks/SearchResultsContext";
-import { LoggerContextProvider } from "hooks/useLogger";
+import { ChatContextProvider } from "hooks/useChat";
 import { PusherProvider } from "hooks/PusherContext";
 import { FullscreenContextProvider } from "hooks/useFullscreen";
 import Pusher from "pusher-js";
@@ -14,11 +14,11 @@ function MyApp({ Component, pageProps }) {
     <FullscreenContextProvider>
       <PusherProvider pusher={pusher}>
         <QueryClientProvider client={queryClient}>
-          <LoggerContextProvider>
+          <ChatContextProvider>
             <SearchContextProvider>
               <Component {...pageProps} />
             </SearchContextProvider>
-          </LoggerContextProvider>
+          </ChatContextProvider>
         </QueryClientProvider>
       </PusherProvider>
     </FullscreenContextProvider>

@@ -12,7 +12,7 @@ interface componentProps {
 const SearchResults: React.FC<componentProps> = (props) => {
   const [results, setResults, isOpen, setIsOpen] = useContext(SearchContext);
   // const [isOpen, setIsOpen] = useState(false);
-
+  const [hoveringCloseMark, setHoveringCloseMark] = useState(false);
   const changeUrl = (videoId) => {
     axios.post("/api/player/seturl", {
       url: ` https://youtu.be/${videoId}`,
@@ -26,10 +26,19 @@ const SearchResults: React.FC<componentProps> = (props) => {
       <div className="w-full  absolute z-50 left-0 top-0 transition-all h-full bg-black bg-opacity-80 overflow-y-scroll ">
         {/* <div> */}
         <span
-          className="fixed left-10 top-10 "
-          onClick={() => setIsOpen(!isOpen)}
+          className="fixed left-10 top-10 hover:scale-120 transform"
+          onClick={() => {
+            setIsOpen(!isOpen);
+            setHoveringCloseMark(false);
+          }}
         >
-          <CloseSvg width={32} height={32} fill="white" />
+          <CloseSvg
+            width={32}
+            height={32}
+            onMouseOver={() => setHoveringCloseMark(true)}
+            onMouseOut={() => setHoveringCloseMark(false)}
+            fill={hoveringCloseMark ? "gray" : "white"}
+          />
         </span>
         <ul
           style={{

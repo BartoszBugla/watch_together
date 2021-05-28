@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import axios from "axios";
 import useForm from "hooks/useForm";
 import { useQuery } from "react-query";
@@ -10,15 +10,18 @@ interface componentProps {
 }
 const ChangeUrlInput: React.FC<componentProps> = ({ roomId }) => {
   const [data, handleChange, setData] = useForm({ query: "" });
-  // console.log(process.env.API_KEY);
+  const [currentlyFocusing, setCurrentlyFocusing] = useState(false);
+
   const [results, setResults, open, setIsOpen] = useContext(SearchContext);
-  const key = "AIzaSyB2c94xX3-kBuU1R4H0dKRK4XkNBBX8vzY";
-  const search = (e) => {
+
+  const key = process.env.API_KEY;
+  // const key = "AIzaSyB2c94xX3-kBuU1R4H0dKRK4XkNBBX8vzY";
+  const search = () => {
     axios({
       url: `https://youtube.googleapis.com/youtube/v3/search?q=${data.query}&key=${key}`,
       method: "get",
       headers: {
-        // Authorization: `Bearer ${process.env.api_key}`,
+        // Authorization: `Bearer ${process.env.API_KEY}`,
         Accept: "application/json",
       },
       params: {
@@ -27,7 +30,6 @@ const ChangeUrlInput: React.FC<componentProps> = ({ roomId }) => {
       },
     })
       .then((res) => {
-        console.log(res.data.items);
         setResults(res.data.items);
         setIsOpen(true);
       })
@@ -37,7 +39,19 @@ const ChangeUrlInput: React.FC<componentProps> = ({ roomId }) => {
     axios.post("/api/player/seturl", { url: data.url, roomId });
     setData({ query: "" });
   };
-
+  //on Enter
+  useEffect(() => {
+    const listener = (e) => {
+      if (currentlyFocusing && e.code === "Enter") {
+        e.preventDefault();
+        search();
+      }
+    };
+    document.addEventListener("keydown", listener);
+    return () => {
+      document.removeEventListener("keydown", listener);
+    };
+  }, [currentlyFocusing, data]);
   return (
     <div className="flex flex-row justify-center">
       <input
@@ -46,6 +60,14 @@ const ChangeUrlInput: React.FC<componentProps> = ({ roomId }) => {
         value={data.query}
         name="query"
         placeholder="Search"
+        onFocus={() => {
+          console.log("focus");
+          setCurrentlyFocusing(true);
+        }}
+        onBlur={() => {
+          console.log("blur");
+          setCurrentlyFocusing(false);
+        }}
       />
       <button
         className="px-5 border-black pointer bg-black bg-opacity-50 "

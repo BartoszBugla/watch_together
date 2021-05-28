@@ -6,7 +6,6 @@ import getUserIdFromCookies from "../../helpers/getUserIdFromCookies";
 import Navbar from "components/navbar";
 import axios from "axios";
 import { useContext, useEffect, useState } from "react";
-import Pusher from "pusher-js";
 const prisma = new PrismaClient();
 import React from "react";
 import type { RoomType } from "types";
@@ -75,7 +74,7 @@ const Home: React.FC<componentProps> = ({ data, userId, query }) => {
       )}
       <SearchResults roomId={data.id} userId={userId} />
       <div className="flex-1 w-full relative">
-        {!isFullscreen && <Chat roomId={data.id} />}
+        {!isFullscreen && <Chat userId={userId} roomId={data.id} />}
 
         <VideoPlayer users={currentUsers} userId={userId} room={data} />
       </div>

@@ -4,9 +4,9 @@ import React, { useContext, useEffect, useRef, useState } from "react";
 import Pusher from "pusher-js";
 import ReactPlayer from "react-player/youtube";
 import ProgressBar from "./ProgressBar";
-import { LoggerContext } from "hooks/useLogger";
+
 import type { RoomType } from "types";
-import useLogger from "hooks/useLogger";
+import { useLogger } from "hooks/useChat";
 import Bottom from "./Bottom ";
 import { FullscreenContext } from "hooks/useFullscreen";
 import { PusherContext } from "hooks/PusherContext";
