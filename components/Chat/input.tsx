@@ -34,6 +34,7 @@ const input: React.FC<componentProps> = ({ sendMessage }) => {
         name="message"
         onFocus={() => setcurrentlyFocusing(true)}
         onBlur={() => setcurrentlyFocusing(false)}
+        autoComplete="off"
       ></input>
       <button
         onClick={() => {

@@ -21,7 +21,7 @@ const VolumeBar: React.FC<componentProps> = ({ volume, setVolume }) => {
         const procent = e.nativeEvent.offsetX / width;
         setVolume(procent);
       }}
-      className="w-2/3  h-1  bg-gray-300 bg-opacity-70 flex flex-col-reverse rounded-sm"
+      className="w-2/3  h-1  cursor-pointer bg-gray-300 bg-opacity-70 flex flex-col-reverse rounded-sm"
     >
       {" "}
       <div

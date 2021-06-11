@@ -37,14 +37,14 @@ const Bottom: React.FC<componentProps> = (props) => {
         width: "100%",
         padding: "2px",
         backgroundColor: "rgba(0,0,0,0.3) ",
-        zIndex: 30,
+        zIndex: 25,
       }}
     >
       <div
         style={{ fill: "white" }}
         className="flex flex-col-reverse md:flex-row justify-between items-center  p-2"
       >
-        <div className="flex flex-row w-56  items-center justify-around ">
+        <div className="flex flex-row w-56 cursor-pointer items-center justify-around  ">
           {props.isPlaying ? (
             <span>
               <StopSvg
@@ -101,7 +101,7 @@ const Bottom: React.FC<componentProps> = (props) => {
           </p>
         </div>
 
-        <div className="w-full flex flex-row items-center justify-around md:justify-between">
+        <div className="w-full flex flex-row items-center cursor-pointer justify-around md:justify-between">
           <ProgressBar {...props} />
           <p className="px-2">
             <FullscreenSvg

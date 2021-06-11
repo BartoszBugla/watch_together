@@ -1,4 +1,5 @@
 module.exports = {
+  plugins: [require("tailwind-scrollbar")],
   purge: ["./pages/**/*.{js,ts,jsx,tsx}", "./components/**/*.{js,ts,jsx,tsx}"],
   darkMode: false, // or 'media' or 'class'
   theme: {

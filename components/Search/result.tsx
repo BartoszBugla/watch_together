@@ -21,9 +21,6 @@ interface componentProps {
 const result: React.FC<componentProps> = ({ videoId, snippet, onClick }) => {
   const date = new Date(snippet.publishTime);
   const currentDate = new Date();
-  console.log(date.getMonth());
-  console.log(date.getFullYear());
-  console.log(date.getDay());
 
   return (
     <li className="text-center cursor-pointer" onClick={onClick}>

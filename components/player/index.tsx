@@ -39,15 +39,21 @@ const VideoPlayer: React.FC<componentProps> = ({ room, userId, users }) => {
     let channel = pusher.subscribe(`room-${id}`);
     channel.bind("pusher:subscription_succeeded", () => {
       const availableUsers = room.users.filter((i) => i != userId);
-      console.log(users);
-
+      console.log(availableUsers);
+      const requestedUser =
+        availableUsers.length > 0 ? availableUsers[0] : room.users[0];
       axios
         .post("/api/player/requestsync", {
           roomId: room.id,
-          to: room.users[0],
+          to: requestedUser,
           from: userId,
         })
-        .then(() => log("pusher", "requested for sync "));
+        .then(() =>
+          log(
+            "pusher",
+            `requested for sync ${requestedUser}, my id is ${userId}`
+          )
+        );
     });
     //actions
     channel.bind("seturl", (data) => {
